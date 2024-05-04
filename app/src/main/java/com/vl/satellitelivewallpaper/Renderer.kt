@@ -1,8 +1,10 @@
 package com.vl.satellitelivewallpaper
 
+import android.animation.ValueAnimator
 import android.opengl.GLSurfaceView
-import android.opengl.GLU
 import android.util.Log
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -30,22 +32,45 @@ class Renderer: GLSurfaceView.Renderer {
         -1f, -1f, 0f,
         1f, -1f, 0f
     ))
-    private val colors = allocateFloatBuffer(floatArrayOf(1f, 0f, 0f))
+
+    private var distance = 0f
+    private val distanceAnimator = ValueAnimator()
+    private var rotation = 0f
+    private val rotationAnimator = ValueAnimator()
+
+    init {
+        distanceAnimator.repeatMode = ValueAnimator.REVERSE
+        distanceAnimator.repeatCount = ValueAnimator.INFINITE
+        distanceAnimator.duration = 1000
+        distanceAnimator.interpolator = AccelerateDecelerateInterpolator()
+        distanceAnimator.setFloatValues(4f, 8f)
+        distanceAnimator.addUpdateListener { distance = it.animatedValue as Float }
+        distanceAnimator.start()
+
+        rotationAnimator.repeatMode = ValueAnimator.RESTART
+        rotationAnimator.repeatCount = ValueAnimator.INFINITE
+        rotationAnimator.duration = 3000
+        rotationAnimator.interpolator = LinearInterpolator()
+        rotationAnimator.setFloatValues(0f, 360f)
+        rotationAnimator.addUpdateListener { rotation = it.animatedValue as Float }
+        rotationAnimator.start()
+    }
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         Log.d(TAG, "Surface created")
-        gl.apply {
-            glEnable(GL10.GL_DEPTH_TEST)
-            /* Projection */
-            /*glMatrixMode(GL10.GL_PROJECTION)
-            glLoadIdentity()
-            glFrustumx(-1, 1, -1, 1, 3, 10)*/
-        }
+        gl.glEnable(GL10.GL_DEPTH_TEST)
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
         Log.d(TAG, "Changed: $width, $height")
         gl.glViewport(0, 0, width, height)
+        gl.apply {
+            /* Projection */
+            glMatrixMode(GL10.GL_PROJECTION)
+            glLoadIdentity()
+            val projectionHeight = height.toFloat() / width
+            glFrustumf(-1f, 1f, -projectionHeight, projectionHeight, 3f, 10f)
+        }
     }
 
     override fun onDrawFrame(gl: GL10) {
@@ -56,21 +81,22 @@ class Renderer: GLSurfaceView.Renderer {
             )
             /* Transformation */
             glMatrixMode(GL10.GL_MODELVIEW)
+            glPushMatrix()
+            glTranslatef(0f, 0f, -distance)
+            glRotatef(-rotation, 0f, 0f, 1f)
             /* Drawing */
+            glColor4f(1f, 0f, 0f, 1f)
             glVertexPointer(3, GL10.GL_FLOAT, 0, vertices)
-            glColor4f(1f, 0f, 0f, 1f) //glColorPointer(3, GL10.GL_FLOAT, 0, colors)
-
             glEnableClientState(GL10.GL_VERTEX_ARRAY)
-            //glEnableClientState(GL10.GL_COLOR_ARRAY)
-
             glDrawArrays(GL10.GL_TRIANGLES, 0, 3)
-
             glDisableClientState(GL10.GL_VERTEX_ARRAY)
-            //glDisableClientState(GL10.GL_COLOR_ARRAY)
+            glPopMatrix()
         }
     }
 
     fun release() {
         Log.d(TAG, "Destroyed")
+        distanceAnimator.cancel()
+        rotationAnimator.cancel()
     }
 }
