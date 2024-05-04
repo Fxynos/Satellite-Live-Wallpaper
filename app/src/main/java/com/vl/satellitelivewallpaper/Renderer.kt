@@ -15,16 +15,12 @@ class Renderer: GLSurfaceView.Renderer {
     companion object {
         private const val TAG = "GL Renderer"
 
-        private fun allocateFloatBuffer(array: FloatArray): FloatBuffer {
-            val byteBuf = ByteBuffer
+        private fun allocateFloatBuffer(array: FloatArray) = ByteBuffer
                 .allocateDirect(array.size * 4)
                 .order(ByteOrder.nativeOrder())
-            val floatBuf = byteBuf.asFloatBuffer()
+                .asFloatBuffer()
                 .put(array)
-            byteBuf.position(0)
-            floatBuf.position(0)
-            return floatBuf
-        }
+                .position(0)
     }
 
     private val vertices = allocateFloatBuffer(floatArrayOf(
