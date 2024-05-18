@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation(project(":glwps"))
+    implementation(libs.rajawali)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

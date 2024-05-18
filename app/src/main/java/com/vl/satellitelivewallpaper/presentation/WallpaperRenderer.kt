@@ -1,4 +1,4 @@
-package com.vl.satellitelivewallpaper
+package com.vl.satellitelivewallpaper.presentation
 
 import android.animation.ValueAnimator
 import android.opengl.GLSurfaceView
@@ -7,11 +7,10 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class Renderer: GLSurfaceView.Renderer {
+class WallpaperRenderer: GLSurfaceView.Renderer {
     companion object {
         private const val TAG = "GL Renderer"
 

@@ -15,6 +15,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+rajawali = { group = "com.github.rajawali.rajawali", name = "rajawali", version = "1.2.1970" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

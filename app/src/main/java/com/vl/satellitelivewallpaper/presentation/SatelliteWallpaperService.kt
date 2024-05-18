@@ -1,6 +1,5 @@
-package com.vl.satellitelivewallpaper
+package com.vl.satellitelivewallpaper.presentation
 
-import android.util.Log
 import net.rbgrn.android.glwallpaperservice.GLWallpaperService
 
 class SatelliteWallpaperService: GLWallpaperService() {
@@ -11,7 +10,7 @@ class SatelliteWallpaperService: GLWallpaperService() {
     override fun onCreateEngine(): GLEngine = Engine()
 
     private inner class Engine: GLEngine() {
-        private val renderer = Renderer()
+        private val renderer = WallpaperRenderer()
 
         init {
             setRenderer(renderer)

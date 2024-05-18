@@ -15,7 +15,7 @@
         android:theme="@style/Theme.SatelliteLiveWallpaper"
         tools:targetApi="31">
 
-        <service android:name=".SatelliteWallpaperService"
+        <service android:name=".presentation.SatelliteWallpaperService"
             android:exported="true"
             android:label="@string/wallpaper_name"
             android:permission="android.permission.BIND_WALLPAPER">
