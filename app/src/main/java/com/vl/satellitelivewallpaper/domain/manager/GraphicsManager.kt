@@ -11,7 +11,7 @@ class GraphicsManager(val painter: Painter, val canvas: Canvas) {
         repeat(model.facetsCount) {
             model.getFacet(it).apply {
                 painter.paint(
-                    material?.diffuseColor ?: Color("#FF0000"),
+                    material?.diffuseColor ?: Color("#000000"),
                     vertices,
                     normals.first()
                 )

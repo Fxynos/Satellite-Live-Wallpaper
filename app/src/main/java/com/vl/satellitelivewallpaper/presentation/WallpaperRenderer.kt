@@ -1,7 +1,9 @@
 package com.vl.satellitelivewallpaper.presentation
 
+import android.animation.ValueAnimator
 import android.opengl.GLSurfaceView
 import android.util.Log
+import android.view.animation.AccelerateDecelerateInterpolator
 import com.vl.satellitelivewallpaper.data.GLCanvas
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
@@ -34,6 +36,15 @@ class WallpaperRenderer(private val model: Model): GLSurfaceView.Renderer {
     }
     private val scope = CoroutineScope(Dispatchers.IO)
 
+    private val scaleAnimator = ValueAnimator().apply {
+        setFloatValues(0.01f, 1f)
+        interpolator = AccelerateDecelerateInterpolator()
+        duration = 3000
+        repeatCount = ValueAnimator.INFINITE
+        repeatMode = ValueAnimator.REVERSE
+        start()
+    }
+
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         Log.d(TAG, "Surface created")
         scope.launch { fpsCounter.collect { Log.d(TAG, "FPS $it") } }
@@ -57,7 +68,7 @@ class WallpaperRenderer(private val model: Model): GLSurfaceView.Renderer {
         graphicsManager.canvas.clear(Color(1f, 1f, 1f))
         graphicsManager.painter.apply { // move and then scale
             moved(Vertex(0f, 0f, -5f)) {
-                scaled(0.1f) {
+                scaled(scaleAnimator.animatedValue as Float) {
                     graphicsManager.draw(model)
                 }
             }

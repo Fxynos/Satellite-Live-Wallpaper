@@ -16,9 +16,9 @@ class Color(@ColorInt private val value: Int) {
     val redByte: Int
         get() = Color.red(value)
     val greenByte: Int
-        get() = Color.red(value)
+        get() = Color.green(value)
     val blueByte: Int
-        get() = Color.red(value)
+        get() = Color.blue(value)
     val alphaByte: Int
         get() = Color.alpha(value)
 

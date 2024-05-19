@@ -22,12 +22,14 @@ class GLPainter(private val gl: GL10): Painter {
     override fun paint(color: Color, vertices: Array<Vertex>, normalVector: Vertex) {
         gl.apply {
             glColor4f(color.red, color.green, color.blue, color.alpha)
-            glVertexPointer(3, GL10.GL_FLOAT, 0, allocateFloatBuffer(FloatArray(vertices.size) {
+            glVertexPointer(3, GL10.GL_FLOAT, 0, allocateFloatBuffer(FloatArray(
+                vertices.size * 3
+            ) {
                 val (x, y, z) = vertices[it / 3]
                 arrayOf(x, y, z)[it % 3]
             }))
             glEnableClientState(GL10.GL_VERTEX_ARRAY)
-            glDrawArrays(GL10.GL_TRIANGLES, 0, 3) // TODO map facet to triangles
+            glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.size) // TODO map facet to triangles
             glDisableClientState(GL10.GL_VERTEX_ARRAY)
             glPopMatrix()
         }

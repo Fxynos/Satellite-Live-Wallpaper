@@ -8,7 +8,7 @@ class GLCanvas(private val gl: GL10): Canvas {
 
     override fun clear(color: Color) {
         gl.apply {
-            glClearColor(1f, 1f, 1f, 1f)
+            glClearColor(color.red, color.green, color.blue, color.alpha)
             glClear(GL10.GL_COLOR_BUFFER_BIT or GL10.GL_DEPTH_BUFFER_BIT)
         }
     }
