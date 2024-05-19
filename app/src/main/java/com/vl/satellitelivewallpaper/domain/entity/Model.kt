@@ -11,7 +11,7 @@ class Model(
     private val materials: Array<Material?>
 ) {
     companion object {
-        const val VERTEX_TEXTURE_NONE = 0
+        const val VERTEX_TEXTURE_NONE = -1
 
         private fun IntArray.split(frameSize: Int) = Array(frameSize) { i ->
             IntStream.range(0, size)
@@ -36,24 +36,22 @@ class Model(
     val facetsCount: Int
         get() = rawFacets.size
 
-    /**
-     * @param position starts with 1
-     */
-    fun getFacet(position: Int): Facet {
-        val frames = rawFacets[position - 1].split(3)
+    fun getFacet(index: Int): Facet {
+        val frames = rawFacets[index].split(3)
 
         val vertices = frames[0].mapToObj(this::getVertex)
             .collect(Collectors.toList()).toTypedArray()
-        val textureMap = frames[1].mapToObj(this::getTextureVertex)
+        val textureMap = frames[1]
+            .mapToObj { if (it == VERTEX_TEXTURE_NONE) null else getTextureVertex(it) }
             .collect(Collectors.toList()).toTypedArray()
         val normals = frames[2].mapToObj(this::getNormal)
             .collect(Collectors.toList()).toTypedArray()
 
-        return Facet(materials[position - 1], vertices, textureMap, normals)
+        return Facet(materials[index], vertices, textureMap, normals)
     }
 
-    private fun getVertex(position: Int): Vertex {
-        val startIndex = (position - 1) * 4
+    private fun getVertex(index: Int): Vertex {
+        val startIndex = index * 4
         return Vertex(
             rawVertices[startIndex],
             rawVertices[startIndex + 1],
@@ -61,8 +59,8 @@ class Model(
         ) // `w` is omitted
     }
 
-    private fun getTextureVertex(position: Int): Vertex {
-        val startIndex = (position - 1) * 3
+    private fun getTextureVertex(index: Int): Vertex {
+        val startIndex = index * 3
         return Vertex(
             rawTextureMap[startIndex],
             rawTextureMap[startIndex + 1],
@@ -70,8 +68,8 @@ class Model(
         )
     }
 
-    private fun getNormal(position: Int): Vertex {
-        val startIndex = (position - 1) * 3
+    private fun getNormal(index: Int): Vertex {
+        val startIndex = index * 3
         return Vertex(
             rawNormals[startIndex],
             rawNormals[startIndex + 1],

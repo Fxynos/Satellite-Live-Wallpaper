@@ -36,7 +36,9 @@ object ModelParser {
                         .map(::parseFloat)
                         .iterator()
                         .apply {
-                            repeat(3) { rawVertices.add(next()) }
+                            repeat(4) {
+                                rawVertices.add(if (it < 3) next() else nextOr(1f))
+                            }
                         }
 
                     "vt" -> args
@@ -71,7 +73,7 @@ object ModelParser {
                                 parseInt(it[0]),
                                 it[1].run { if (isEmpty()) 0 else parseInt(this) },
                                 parseInt(it[2])
-                            )
+                            ).map(Int::dec) // OBJ indices start with 1
                         }.toCollection(ArrayList())
                         .toIntArray()
                         .apply {
