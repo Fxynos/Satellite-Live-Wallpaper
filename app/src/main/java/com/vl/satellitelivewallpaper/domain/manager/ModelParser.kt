@@ -9,6 +9,9 @@ import java.lang.Float.parseFloat
 import java.lang.Integer.parseInt
 import java.util.LinkedList
 
+/**
+ * Parser for Wavefront OBJ and MTL files
+ */
 object ModelParser {
     private const val TAG = "ModelParser"
 
