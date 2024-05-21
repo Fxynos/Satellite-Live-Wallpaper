@@ -12,7 +12,7 @@ class WallpaperService: GLWallpaperService() {
 
     private inner class Engine: GLEngine() {
         private val renderer = WallpaperRenderer(ModelParser.parse(
-            resources.openRawResource(R.raw.test),
+            resources.openRawResource(R.raw.rocket),
             arrayOf(Material(
                 "Material",
                 Color("#00FF00"),

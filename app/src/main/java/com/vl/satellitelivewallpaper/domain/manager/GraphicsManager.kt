@@ -4,6 +4,7 @@ import com.vl.satellitelivewallpaper.domain.boundary.Canvas
 import com.vl.satellitelivewallpaper.domain.boundary.Painter
 import com.vl.satellitelivewallpaper.domain.entity.Color
 import com.vl.satellitelivewallpaper.domain.entity.Model
+import com.vl.satellitelivewallpaper.domain.entity.Vertex
 
 class GraphicsManager(val painter: Painter, val canvas: Canvas) {
 

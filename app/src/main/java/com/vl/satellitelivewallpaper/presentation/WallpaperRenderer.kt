@@ -3,7 +3,7 @@ package com.vl.satellitelivewallpaper.presentation
 import android.animation.ValueAnimator
 import android.opengl.GLSurfaceView
 import android.util.Log
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import com.vl.satellitelivewallpaper.data.GLCanvas
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
@@ -36,12 +36,12 @@ class WallpaperRenderer(private val model: Model): GLSurfaceView.Renderer {
     }
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val scaleAnimator = ValueAnimator().apply {
-        setFloatValues(0.01f, 1f)
-        interpolator = AccelerateDecelerateInterpolator()
-        duration = 3000
+    private val rotationAnimator = ValueAnimator().apply {
+        setFloatValues(0f, 360f)
+        interpolator = LinearInterpolator()
+        duration = 5000
         repeatCount = ValueAnimator.INFINITE
-        repeatMode = ValueAnimator.REVERSE
+        repeatMode = ValueAnimator.RESTART
         start()
     }
 
@@ -65,11 +65,13 @@ class WallpaperRenderer(private val model: Model): GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10) {
-        graphicsManager.canvas.clear(Color(1f, 1f, 1f))
+        graphicsManager.canvas.clear(Color(0, 0, 0))
         graphicsManager.painter.apply { // move and then scale
-            moved(Vertex(0f, 0f, -5f)) {
-                scaled(scaleAnimator.animatedValue as Float) {
-                    graphicsManager.draw(model)
+            moved(Vertex(0f, 0f, -8f)) {
+                scaled(0.2f) {
+                    rotated(rotationAnimator.animatedValue as Float, Vertex(-1f, -1f, -1f)) {
+                        graphicsManager.draw(model)
+                    }
                 }
             }
         }

@@ -31,7 +31,6 @@ class GLPainter(private val gl: GL10): Painter {
             glEnableClientState(GL10.GL_VERTEX_ARRAY)
             glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.size) // TODO map facet to triangles
             glDisableClientState(GL10.GL_VERTEX_ARRAY)
-            glPopMatrix()
         }
     }
 
