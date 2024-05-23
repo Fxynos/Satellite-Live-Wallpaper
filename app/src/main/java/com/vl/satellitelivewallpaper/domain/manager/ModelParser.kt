@@ -15,7 +15,7 @@ import java.util.LinkedList
 object ModelParser {
     private const val TAG = "ModelParser"
 
-    fun parse(objFile: InputStream, materials: Array<Material>) = InputStreamReader(objFile).useLines { lines ->
+    fun parseObjModel(objFile: InputStream, materials: Array<Material>) = InputStreamReader(objFile).useLines { lines ->
         val rawVertices = LinkedList<Float>()
         val rawTextureMap = LinkedList<Float>()
         val rawNormals = LinkedList<Float>()

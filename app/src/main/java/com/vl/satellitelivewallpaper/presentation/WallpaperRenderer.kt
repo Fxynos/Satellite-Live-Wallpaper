@@ -1,6 +1,5 @@
 package com.vl.satellitelivewallpaper.presentation
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -8,10 +7,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.GLSurfaceView
 import android.util.Log
-import android.view.OrientationEventListener
-import android.view.animation.LinearInterpolator
 import com.vl.satellitelivewallpaper.R
-import com.vl.satellitelivewallpaper.data.GLCanvas
+import com.vl.satellitelivewallpaper.data.GLScene
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
 import com.vl.satellitelivewallpaper.domain.entity.Material
@@ -40,15 +37,17 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     }
 
     private lateinit var graphicsManager: GraphicsManager
-    private val model: Model = ModelParser.parse(
+    private val materials = arrayOf(Material(
+        "Material",
+        Color("#0000FF"),
+        Color("#00FF00"),
+        Color("#FF0000")
+    ))
+    private val model: Model = ModelParser.parseObjModel(
         context.resources.openRawResource(R.raw.rocket),
-        arrayOf(Material(
-            "Material",
-            Color("#00FF00"),
-            Color("#00FF00"),
-            Color("#00FF00")
-        ))
+        materials
     )
+
     private val fps = AtomicInteger(0)
     private val fpsCounter = flow {
         while (true) {
@@ -81,24 +80,31 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         Log.d(TAG, "Surface created")
         scope.launch { fpsCounter.collect { Log.d(TAG, "FPS $it") } }
-        graphicsManager = GraphicsManager(GLPainter(gl), GLCanvas(gl))
+        graphicsManager = GraphicsManager(GLPainter(gl), GLScene(gl), true)
+        graphicsManager.scene.isLightEnabled = true
+        graphicsManager.scene.setLight(
+            Vertex(0f, 0f, 3f),
+            Color("#FFFFFF"),
+            Color("#FFFFFF"),
+            Color("#FFFFFF")
+        )
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
         Log.d(TAG, "Changed: $width, $height")
-        graphicsManager.canvas.setBounds(0, 0, width, height)
+        graphicsManager.scene.setBounds(0, 0, width, height)
 
-        gl.apply {
-            /* Projection */
-            glMatrixMode(GL10.GL_PROJECTION)
-            glLoadIdentity()
-            val projectionHeight = height.toFloat() / width
-            glFrustumf(-1f, 1f, -projectionHeight, projectionHeight, 3f, 10f)
-        }
+        val projectionHeight = height.toFloat() / width
+        graphicsManager.scene.setCamera(
+            bottom = -projectionHeight,
+            top = projectionHeight,
+            near = 3f,
+            far = 10f
+        )
     }
 
     override fun onDrawFrame(gl: GL10) {
-        graphicsManager.canvas.clear(Color(0, 0, 0))
+        graphicsManager.scene.clear(Color(0, 0, 0))
         graphicsManager.painter.apply { // move and then scale
             moved(Vertex(0f, 0f, -8f)) {
                 scaled(0.2f) {
