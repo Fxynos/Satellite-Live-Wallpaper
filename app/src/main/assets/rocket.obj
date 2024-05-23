@@ -1,6 +1,6 @@
 # Blender v2.93.0 OBJ File: 'Space_rocket.blend'
 # www.blender.org
-mtllib rocket_mtl.mtl
+mtllib rocket.mtl
 o Rocket_Cylinder.004
 v -0.821169 10.100526 1.130242
 v -0.753136 11.166897 1.036603

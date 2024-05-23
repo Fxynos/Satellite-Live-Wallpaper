@@ -37,24 +37,12 @@ class GLScene(private val gl: GL10): Scene {
         }
     }
 
-    override fun setLight(position: Vertex, ambientColor: Color, diffuseColor: Color, specularColor: Color) {
+    override fun setLight(position: Vertex) {
         gl.apply {
             glEnable(GL10.GL_LIGHT0)
             glLightfv(
                 GL10.GL_LIGHT0, GL10.GL_POSITION,
                 floatArrayOf(position.x, position.y, position.z, 1f), 0
-            )
-            glLightfv(
-                GL10.GL_LIGHT0, GL10.GL_DIFFUSE,
-                floatArrayOf(diffuseColor.red, diffuseColor.green, diffuseColor.blue, 1f), 0
-            )
-            glLightfv(
-                GL10.GL_LIGHT0, GL10.GL_AMBIENT,
-                floatArrayOf(ambientColor.red, ambientColor.green, ambientColor.blue, 1f), 0
-            )
-            glLightfv(
-                GL10.GL_LIGHT0, GL10.GL_SPECULAR,
-                floatArrayOf(specularColor.red, specularColor.green, specularColor.blue, 1f), 0
             )
         }
     }

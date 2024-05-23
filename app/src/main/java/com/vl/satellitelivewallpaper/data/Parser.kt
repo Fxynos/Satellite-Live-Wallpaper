@@ -1,22 +1,41 @@
 package com.vl.satellitelivewallpaper.data
 
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.opengl.GLUtils
 import android.util.Log
 import com.vl.satellitelivewallpaper.domain.entity.Color
 import com.vl.satellitelivewallpaper.domain.entity.Material
 import com.vl.satellitelivewallpaper.domain.entity.Model
-import java.io.InputStream
 import java.io.InputStreamReader
 import java.lang.Float.parseFloat
 import java.lang.Integer.parseInt
 import java.util.LinkedList
+import javax.microedition.khronos.opengles.GL10
 
 /**
  * Parser for Wavefront OBJ and MTL files
  */
-object Parser {
-    private const val TAG = "ModelParser"
+class Parser(private val context: Context, private val gl: GL10) {
+    companion object {
+        private const val TAG = "ModelParser"
 
-    fun parseObjModel(objFile: InputStream, materials: Array<Material>) = InputStreamReader(objFile).useLines { lines ->
+        private fun Sequence<String>.parseCommands() =
+            map { it.split('#', limit = 2).first() }
+                .filter(String::isNotBlank)
+                .map { line ->
+                    val (operator, args) = line
+                        .split(' ', limit = 2)
+                        .map(String::trim)
+                    operator to args
+                }
+
+        private fun <T> Iterator<T>.nextOr(default: T) =
+            if (hasNext()) next() else default
+    }
+
+    fun parseObjModel(objAsset: String) = InputStreamReader(context.assets.open(objAsset)).useLines { lines ->
+        val materials = LinkedList<Material>()
         val rawVertices = LinkedList<Float>()
         val rawTextureMap = LinkedList<Float>()
         val rawNormals = LinkedList<Float>()
@@ -81,6 +100,8 @@ object Parser {
 
                 /* Display Attributes */
 
+                "mtllib" -> materials.addAll(parseMaterialLibrary(args))
+
                 "usemtl" -> {
                     val name = args.trim()
                     currentMaterial = materials.find { it.name == name }
@@ -101,7 +122,7 @@ object Parser {
         )
     }
 
-    fun parseMtlLib(objFile: InputStream) = InputStreamReader(objFile).useLines { lines ->
+    private fun parseMaterialLibrary(mtlAsset: String) = InputStreamReader(context.assets.open(mtlAsset)).useLines { lines ->
         val defaultMaterial = Material("default", Color(0,0,0), Color(0,0,0), Color(0,0,0))
         lines.parseCommands().scan(LinkedList<Material>()) { materials, (operator, args) ->
             when (operator) {
@@ -123,7 +144,8 @@ object Parser {
                     }
                 }
 
-                "map_Kd" -> materials[materials.lastIndex] = materials.last.copy(textureMap = args)
+                "map_Kd" -> materials[materials.lastIndex] =
+                    materials.last.copy(texture = bindTexture(args))
 
                 else -> Log.w(TAG, "Skip MTL operator \"$operator\" with args \"$args\"")
             }
@@ -131,16 +153,17 @@ object Parser {
         }.last().toTypedArray()
     }
 
-    private fun Sequence<String>.parseCommands() =
-        map { it.split('#', limit = 2).first() }
-            .filter(String::isNotBlank)
-            .map { line ->
-                val (operator, args) = line
-                    .split(' ', limit = 2)
-                    .map(String::trim)
-                operator to args
-            }
-
-    private fun <T> Iterator<T>.nextOr(default: T) =
-        if (hasNext()) next() else default
+    /**
+     * Immediately bind texture to OpenGL
+     */
+    private fun bindTexture(textureAsset: String): Int {
+        val bitmap = BitmapFactory.decodeStream(context.assets.open(textureAsset))
+        val textureId = IntArray(1)
+        gl.glEnable(GL10.GL_TEXTURE_2D)
+        gl.glGenTextures(1, textureId, 0)
+        gl.glBindTexture(GL10.GL_TEXTURE_2D, textureId.first())
+        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0)
+        bitmap.recycle()
+        return textureId.first()
+    }
 }

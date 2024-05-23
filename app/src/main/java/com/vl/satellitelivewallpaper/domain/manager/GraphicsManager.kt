@@ -28,6 +28,7 @@ class GraphicsManager(
                 painter.paint(
                     material ?: MATERIAL_DEFAULT,
                     if (triangulateFacets) triangulate(vertices) else vertices,
+                    textureMap,
                     if (negateNormals) normals.map(Vertex::reflect).toTypedArray() else normals
                 )
             }

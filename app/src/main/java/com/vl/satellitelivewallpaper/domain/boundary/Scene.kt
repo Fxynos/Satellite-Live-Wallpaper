@@ -22,5 +22,5 @@ interface Scene {
         far: Float = 1f
     )
 
-    fun setLight(position: Vertex, ambientColor: Color, diffuseColor: Color, specularColor: Color)
+    fun setLight(position: Vertex)
 }

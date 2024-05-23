@@ -41,9 +41,12 @@ class Model(
 
         val vertices = frames[0].mapToObj(this::getVertex)
             .collect(Collectors.toList()).toTypedArray()
-        val textureMap = frames[1]
-            .mapToObj { if (it == VERTEX_TEXTURE_NONE) null else getTextureVertex(it) }
-            .collect(Collectors.toList()).toTypedArray()
+
+        // if the first texel is omitted, there are no texels at all
+        val textureMap = if (rawFacets[index][1] == VERTEX_TEXTURE_NONE) null else
+            frames[1].mapToObj(this::getTextureVertex)
+                .collect(Collectors.toList()).toTypedArray()
+
         val normals = frames[2].mapToObj(this::getNormal)
             .collect(Collectors.toList()).toTypedArray()
 

@@ -5,5 +5,5 @@ data class Material( // TODO support textures
     val ambientColor: Color,
     val diffuseColor: Color,
     val specularColor: Color,
-    val textureMap: String? = null
+    val texture: Int? = null
 )

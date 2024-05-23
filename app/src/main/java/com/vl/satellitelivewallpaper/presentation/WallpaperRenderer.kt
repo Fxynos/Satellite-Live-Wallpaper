@@ -7,7 +7,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.GLSurfaceView
 import android.util.Log
-import com.vl.satellitelivewallpaper.R
 import com.vl.satellitelivewallpaper.data.GLScene
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
@@ -28,7 +27,7 @@ import kotlin.math.acos
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventListener {
+class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, SensorEventListener {
     companion object {
         private const val TAG = "WallpaperRenderer"
 
@@ -36,8 +35,8 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     }
 
     private lateinit var graphicsManager: GraphicsManager
-    private val materials = Parser.parseMtlLib(context.resources.openRawResource(R.raw.rocket_mtl))
-    private val model: Model = Parser.parseObjModel(context.resources.openRawResource(R.raw.rocket_obj), materials)
+    private lateinit var rocketModel: Model
+    private lateinit var earthModel: Model
 
     private val fps = AtomicInteger(0)
     private val fpsCounter = flow {
@@ -71,14 +70,14 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         Log.d(TAG, "Surface created")
         scope.launch { fpsCounter.collect { Log.d(TAG, "FPS $it") } }
+
+        Parser(context, gl).apply {
+            rocketModel = parseObjModel("rocket.obj")
+            earthModel = parseObjModel("earth.obj")
+        }
+
         graphicsManager = GraphicsManager(GLPainter(gl), GLScene(gl), true)
         graphicsManager.scene.isLightEnabled = true
-        graphicsManager.scene.setLight(
-            Vertex(0f, 0f, 3f),
-            Color("#FFFFFF"),
-            Color("#FFFFFF"),
-            Color("#FFFFFF")
-        )
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
@@ -97,11 +96,10 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     override fun onDrawFrame(gl: GL10) {
         graphicsManager.scene.clear(Color(0, 0, 0))
         graphicsManager.painter.apply { // move and then scale
-            moved(Vertex(0f, 0f, -8f)) {
-                scaled(0.2f) {
-                    rotated(rotation.first * 180 / Math.PI.toFloat(), rotation.second) {
-                        graphicsManager.draw(model)
-                    }
+            moved(Vertex(0f, 0f, -5f)) {
+                rotated(rotation.first * 180 / Math.PI.toFloat(), rotation.second) {
+                    graphicsManager.scene.setLight(Vertex(0f, 0f, 3f))
+                    graphicsManager.draw(earthModel)
                 }
             }
         }
