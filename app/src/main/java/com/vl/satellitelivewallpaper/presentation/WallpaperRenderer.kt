@@ -11,11 +11,10 @@ import com.vl.satellitelivewallpaper.R
 import com.vl.satellitelivewallpaper.data.GLScene
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
-import com.vl.satellitelivewallpaper.domain.entity.Material
 import com.vl.satellitelivewallpaper.domain.entity.Model
 import com.vl.satellitelivewallpaper.domain.entity.Vertex
 import com.vl.satellitelivewallpaper.domain.manager.GraphicsManager
-import com.vl.satellitelivewallpaper.domain.manager.ModelParser
+import com.vl.satellitelivewallpaper.data.Parser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -37,16 +36,8 @@ class WallpaperRenderer(context: Context): GLSurfaceView.Renderer, SensorEventLi
     }
 
     private lateinit var graphicsManager: GraphicsManager
-    private val materials = arrayOf(Material(
-        "Material",
-        Color("#0000FF"),
-        Color("#00FF00"),
-        Color("#FF0000")
-    ))
-    private val model: Model = ModelParser.parseObjModel(
-        context.resources.openRawResource(R.raw.rocket),
-        materials
-    )
+    private val materials = Parser.parseMtlLib(context.resources.openRawResource(R.raw.rocket_mtl))
+    private val model: Model = Parser.parseObjModel(context.resources.openRawResource(R.raw.rocket_obj), materials)
 
     private val fps = AtomicInteger(0)
     private val fpsCounter = flow {
