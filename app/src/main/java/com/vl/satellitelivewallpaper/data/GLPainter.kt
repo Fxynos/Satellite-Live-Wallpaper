@@ -23,7 +23,10 @@ class GLPainter(private val gl: GL10): Painter {
         }
     }
 
-    init { gl.glEnable(GL10.GL_DEPTH_TEST) }
+    init {
+        gl.glEnable(GL10.GL_DEPTH_TEST)
+        gl.glEnable(GL10.GL_NORMALIZE) // otherwise colors would be changed with scaling
+    }
 
     override fun paint(material: Material, vertices: Array<Vertex>, textureMap: Array<Vertex>?, normals: Array<Vertex>) {
         gl.apply {
@@ -78,7 +81,7 @@ class GLPainter(private val gl: GL10): Painter {
     private fun applyMaterialColor(glColor: Int, color: Color) {
         gl.glMaterialfv(
             GL10.GL_FRONT_AND_BACK, glColor,
-            floatArrayOf(color.red, color.green, color.blue, 1f), 0
+            floatArrayOf(color.red, color.green, color.blue, color.alpha), 0
         )
     }
 

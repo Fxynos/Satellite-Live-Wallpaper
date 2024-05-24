@@ -5,8 +5,6 @@ import com.vl.satellitelivewallpaper.domain.entity.Vertex
 
 interface Scene {
 
-    var isLightEnabled: Boolean
-
     fun clear(color: Color)
     fun setBounds(x: Int, y: Int, width: Int, height: Int)
 

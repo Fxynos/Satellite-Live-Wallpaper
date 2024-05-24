@@ -35,8 +35,8 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
     }
 
     private lateinit var graphicsManager: GraphicsManager
-    private lateinit var rocketModel: Model
     private lateinit var earthModel: Model
+    private lateinit var satelliteModel: Model
 
     private val fps = AtomicInteger(0)
     private val fpsCounter = flow {
@@ -70,14 +70,14 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
         Log.d(TAG, "Surface created")
         scope.launch { fpsCounter.collect { Log.d(TAG, "FPS $it") } }
+        gl.glEnable(GL10.GL_COLOR_MATERIAL)
 
         Parser(context, gl).apply {
-            rocketModel = parseObjModel("rocket.obj")
             earthModel = parseObjModel("earth.obj")
+            satelliteModel = parseObjModel("satellite.obj")
         }
 
-        graphicsManager = GraphicsManager(GLPainter(gl), GLScene(gl), true)
-        graphicsManager.scene.isLightEnabled = true
+        graphicsManager = GraphicsManager(GLPainter(gl), GLScene(gl))
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
@@ -99,7 +99,9 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
             moved(Vertex(0f, 0f, -5f)) {
                 rotated(rotation.first * 180 / Math.PI.toFloat(), rotation.second) {
                     graphicsManager.scene.setLight(Vertex(0f, 0f, 3f))
-                    graphicsManager.draw(earthModel)
+                    scaled(0.1f) {
+                        graphicsManager.draw(satelliteModel)
+                    }
                 }
             }
         }

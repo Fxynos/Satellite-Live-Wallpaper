@@ -7,15 +7,6 @@ import javax.microedition.khronos.opengles.GL10
 
 class GLScene(private val gl: GL10): Scene {
 
-    override var isLightEnabled: Boolean = false
-        set(value) {
-            field = value
-            if (isLightEnabled)
-                gl.glEnable(GL10.GL_LIGHTING)
-            else
-                gl.glDisable(GL10.GL_LIGHTING)
-        }
-
     override fun clear(color: Color) {
         gl.apply {
             glClearColor(color.red, color.green, color.blue, color.alpha)
@@ -39,6 +30,7 @@ class GLScene(private val gl: GL10): Scene {
 
     override fun setLight(position: Vertex) {
         gl.apply {
+            glEnable(GL10.GL_LIGHTING)
             glEnable(GL10.GL_LIGHT0)
             glLightfv(
                 GL10.GL_LIGHT0, GL10.GL_POSITION,

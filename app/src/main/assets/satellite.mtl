@@ -1,0 +1,80 @@
+newmtl body
+Ns 250
+Ka 1 1 1
+Kd 0.2 0.2 0.2
+Ks 0 0 0
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl panel
+Ns 1000
+Ka 1.0 1.0 1.0
+Kd 0.3 0.4 1
+Ks 0.3 0.4 1
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl something_idk
+Ns 307.52067
+Ka 1 1 1
+Kd 0.05 0.02 0.4
+Ks 0.05 0.02 0.4
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl bottleneck
+Ns 60.24794
+Ka 0 0 0
+Kd 0 0.1 0
+Ks 0 0 0
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 3
+
+newmtl mat4
+Ns 410.76452
+Ka 1.0 1.0 1.0
+Kd 0.14008 0.68911 1
+Ks 0.5 0.5 0.5
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl mat5
+Ns 250
+Ka 0 0 0
+Kd 0 0.1 0
+Ks 0 0 0
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl mat6
+Ns 250
+Ka 1.0 1.0 1.0
+Kd 0 0.26088 0.2674
+Ks 0.5 0.5 0.5
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+
+newmtl mat7
+Ns 250
+Ka 1.0 1.0 1.0
+Kd 0.0832 0.0832 0.0832
+Ks 0.5 0.5 0.5
+Ke 0 0 0
+Ni 1.45
+d 1
+illum 2
+

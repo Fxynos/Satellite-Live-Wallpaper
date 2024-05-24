@@ -10,9 +10,7 @@ import java.util.LinkedList
 
 class GraphicsManager(
     val painter: Painter,
-    val scene: Scene,
-    private val triangulateFacets: Boolean = false,
-    private val negateNormals: Boolean = false
+    val scene: Scene
 ) {
     companion object {
         private val MATERIAL_DEFAULT = Material("default",
@@ -22,7 +20,7 @@ class GraphicsManager(
         )
     }
 
-    fun draw(model: Model) {
+    fun draw(model: Model, triangulateFacets: Boolean = false, negateNormals: Boolean = false) {
         repeat(model.facetsCount) {
             model.getFacet(it).apply {
                 painter.paint(
