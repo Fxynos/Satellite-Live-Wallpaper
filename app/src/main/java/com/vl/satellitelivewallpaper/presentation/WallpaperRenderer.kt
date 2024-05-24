@@ -1,5 +1,6 @@
 package com.vl.satellitelivewallpaper.presentation
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -7,6 +8,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.opengl.GLSurfaceView
 import android.util.Log
+import android.view.animation.LinearInterpolator
 import com.vl.satellitelivewallpaper.data.GLScene
 import com.vl.satellitelivewallpaper.data.GLPainter
 import com.vl.satellitelivewallpaper.domain.entity.Color
@@ -55,14 +57,23 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
             SensorManager.SENSOR_DELAY_UI
         )
     }
-    @Volatile private var rotation = 0f to Vertex(0f, 0f, 0f) // radians to vector
+    @Volatile private var sceneRotation = 0f to Vertex(0f, 0f, 0f) // radians to vector
+
+    private val earthRotationAnimator = ValueAnimator().apply {
+        setFloatValues(0f, 360f)
+        interpolator = LinearInterpolator()
+        duration = 60_000
+        repeatCount = ValueAnimator.INFINITE
+        repeatMode = ValueAnimator.RESTART
+        start()
+    }
 
     override fun onSensorChanged(event: SensorEvent) {
         // rotates gravity vector from (0; -1; 0) to following vector
         val (x, y, z) = event.values
         // scalar product of vectors is cos of angle between them
         // vector product is a normal of plane of these vectors n(-z; 0; x)
-        rotation = -acos(y / sqrt(sqr(x) + sqr(y) + sqr(z))) to Vertex(-z, 0f, x)
+        sceneRotation = -acos(y / sqrt(sqr(x) + sqr(y) + sqr(z))) to Vertex(-z, 0f, x)
     }
 
     override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) = Unit
@@ -89,18 +100,30 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
             bottom = -projectionHeight,
             top = projectionHeight,
             near = 3f,
-            far = 10f
+            far = 15f
         )
     }
 
     override fun onDrawFrame(gl: GL10) {
         graphicsManager.scene.clear(Color(0, 0, 0))
-        graphicsManager.painter.apply { // move and then scale
+        graphicsManager.painter.apply {
             moved(Vertex(0f, 0f, -5f)) {
-                rotated(rotation.first * 180 / Math.PI.toFloat(), rotation.second) {
-                    graphicsManager.scene.setLight(Vertex(0f, 0f, 3f))
+                rotated(sceneRotation.first * 180 / Math.PI.toFloat(), sceneRotation.second) {
+                    graphicsManager.scene.setLight(Vertex(0f, 0f, 7f))
+
+                    moved(Vertex(0f, 0f, -5f)) {
+                        rotated(
+                            earthRotationAnimator.animatedValue as Float,
+                            Vertex(-1f, 1f, -1f)
+                        ) {
+                            graphicsManager.draw(earthModel, triangulateFacets = true)
+                        }
+                    }
+
                     scaled(0.1f) {
-                        graphicsManager.draw(satelliteModel)
+                        rotated(180f, Vertex(0f, 1f, 0f)) {
+                            graphicsManager.draw(satelliteModel)
+                        }
                     }
                 }
             }
@@ -112,5 +135,6 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
         Log.d(TAG, "Destroyed")
         scope.cancel()
         sensorManager.unregisterListener(this)
+        earthRotationAnimator.cancel()
     }
 }
