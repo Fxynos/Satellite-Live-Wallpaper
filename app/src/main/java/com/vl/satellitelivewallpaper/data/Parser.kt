@@ -113,10 +113,6 @@ class Parser(private val context: Context, private val gl: GL10) {
             }
         }
 
-        materials.forEach {
-            println("${it.name} ${it.diffuseColor.red} ${it.diffuseColor.green} ${it.diffuseColor.blue}")
-        }
-
         Model(
             rawVertices.toFloatArray(),
             rawTextureMap.toFloatArray(),
