@@ -116,7 +116,7 @@ class WallpaperRenderer(private val context: Context): GLSurfaceView.Renderer, S
                             earthRotationAnimator.animatedValue as Float,
                             Vertex(-1f, 1f, -1f)
                         ) {
-                            graphicsManager.draw(earthModel, triangulateFacets = true)
+                            graphicsManager.draw(earthModel)
                         }
                     }
 

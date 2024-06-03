@@ -1,6 +1,7 @@
 package com.vl.satellitelivewallpaper.data
 
 import com.vl.satellitelivewallpaper.domain.boundary.Painter
+import com.vl.satellitelivewallpaper.domain.boundary.Painting
 import com.vl.satellitelivewallpaper.domain.entity.Color
 import com.vl.satellitelivewallpaper.domain.entity.Material
 import com.vl.satellitelivewallpaper.domain.entity.Vertex
@@ -28,14 +29,23 @@ class GLPainter(private val gl: GL10): Painter {
         gl.glEnable(GL10.GL_NORMALIZE) // otherwise colors would be changed with scaling
     }
 
-    override fun paint(material: Material, vertices: Array<Vertex>, textureMap: Array<Vertex>?, normals: Array<Vertex>) {
-        gl.apply {
-            applyMaterial(material, textureMap)
-            glVertexPointer(3, GL10.GL_FLOAT, 0, allocateFloatBuffer(vertices.flatMapCoordinates()))
-            glNormalPointer(3, GL10.GL_FLOAT, allocateFloatBuffer(normals.flatMapCoordinates()))
-            glEnableClientState(GL10.GL_VERTEX_ARRAY)
-            glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.size)
-            glDisableClientState(GL10.GL_VERTEX_ARRAY)
+    override fun prepare(
+        material: Material,
+        vertices: Array<Vertex>,
+        textureMap: Array<Vertex>?,
+        normals: Array<Vertex>
+    ): Painting {
+        val vertexBuffer = allocateFloatBuffer(vertices.flatMapCoordinates())
+        val normalsBuffer = allocateFloatBuffer(normals.flatMapCoordinates())
+        return Painting {
+            gl.apply {
+                applyMaterial(material, textureMap)
+                glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer)
+                glNormalPointer(3, GL10.GL_FLOAT, normalsBuffer)
+                glEnableClientState(GL10.GL_VERTEX_ARRAY)
+                glDrawArrays(GL10.GL_TRIANGLES, 0, vertices.size)
+                glDisableClientState(GL10.GL_VERTEX_ARRAY)
+            }
         }
     }
 

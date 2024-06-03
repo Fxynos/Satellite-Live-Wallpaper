@@ -1,7 +1,9 @@
 package com.vl.satellitelivewallpaper.domain.manager
 
+import android.util.Log
 import com.vl.satellitelivewallpaper.domain.boundary.Scene
 import com.vl.satellitelivewallpaper.domain.boundary.Painter
+import com.vl.satellitelivewallpaper.domain.boundary.Painting
 import com.vl.satellitelivewallpaper.domain.entity.Color
 import com.vl.satellitelivewallpaper.domain.entity.Material
 import com.vl.satellitelivewallpaper.domain.entity.Model
@@ -13,6 +15,7 @@ class GraphicsManager(
     val scene: Scene
 ) {
     companion object {
+        private const val TAG = "GraphicsManager"
         private val MATERIAL_DEFAULT = Material("default",
             Color("#AAAAAA"),
             Color("#EEEEEE"),
@@ -20,17 +23,24 @@ class GraphicsManager(
         )
     }
 
-    fun draw(model: Model, triangulateFacets: Boolean = false, negateNormals: Boolean = false) {
-        repeat(model.facetsCount) {
-            model.getFacet(it).apply {
-                painter.paint(
-                    material ?: MATERIAL_DEFAULT,
-                    if (triangulateFacets) triangulate(vertices) else vertices,
-                    textureMap,
-                    if (negateNormals) normals.map(Vertex::reflect).toTypedArray() else normals
-                )
+    private val cache = HashMap<Model, List<Painting>>()
+
+    fun draw(model: Model) {
+        if (!cache.containsKey(model))
+            cache[model] = (0 until model.facetsCount).asSequence().map {
+                model.getFacet(it).run {
+                    painter.prepare(
+                        material ?: MATERIAL_DEFAULT,
+                        triangulate(vertices),
+                        textureMap,
+                        normals
+                    )
+                }
+            }.toCollection(LinkedList()).also {
+                Log.d(TAG, "Cached model with ${it.size} facets")
             }
-        }
+
+        cache[model]!!.forEach(Painting::paint)
     }
 
     /**
