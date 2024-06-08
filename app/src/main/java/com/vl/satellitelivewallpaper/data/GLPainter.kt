@@ -40,7 +40,7 @@ class GLPainter(private val gl: GL10): Painter {
             var step = 1
             do {
                 var wasTriangle = false
-                for (vertex in 0 until (verticesCount - 2 * step) step (2 * step)) {
+                for (vertex in 0 .. (verticesCount - 2 * step) step (2 * step)) {
                     wasTriangle = true
                     triangles.addAll(listOf(
                         vertex,
@@ -81,8 +81,8 @@ class GLPainter(private val gl: GL10): Painter {
                 glEnableClientState(GL10.GL_VERTEX_ARRAY)
 
                 var pointer = 0
-                facets.forEach { facet ->
-                    val verticesCount = facet.vertices.size
+                facets.forEachIndexed { i, facet ->
+                    val verticesCount = triangles[i].size
                     applyMaterial(facet.material ?: MATERIAL_DEFAULT)
                     glDrawArrays(GL10.GL_TRIANGLES, pointer, verticesCount)
                     pointer += verticesCount
